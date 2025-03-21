@@ -25,7 +25,7 @@ model Product {
   price         Int
   stockQuantity Int
   sellerId      Int
-  seller        User?       @relation(fields: [sellerId], references: [id])
+  seller        User?       @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   OrderItems    OrderItem[]
 }
 
@@ -34,7 +34,7 @@ model Order {
   userId      Int
   orderDate   DateTime
   totalAmount Int
-  User        User        @relation(fields: [userId], references: [id])
+  User        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   Payment     Payment[]
   OrderItems  OrderItem[]
 }
@@ -44,7 +44,7 @@ model Payment {
   orderId       Int
   paymentDate   DateTime
   paymentStatus Boolean
-  order         Order    @relation(fields: [orderId], references: [orderId])
+  order         Order    @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
 }
 
 model OrderItem {
@@ -52,6 +52,6 @@ model OrderItem {
   orderId     Int
   productId   Int
   quantity    Int
-  Order       Order   @relation(fields: [orderId], references: [orderId])
-  Product     Product @relation(fields: [productId], references: [productId])
+  Order       Order   @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
+  Product     Product @relation(fields: [productId], references: [productId], onDelete: Cascade)
 }

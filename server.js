@@ -7,6 +7,8 @@ import protectedRoutes from "./src/routes/protectedRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import productRoutes from "./src/routes/productRoutes.js";
 import orderRoutes from "./src/routes/orderRoutes.js";
+import paymentRoutes from "./src/routes/paymentRoutes.js";
+import swaggerSetup from "./swagger.js";
 
 dotenv.config();
 
@@ -22,10 +24,13 @@ app.use("/api/protected", protectedRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Express Auth API" });
 });
+
+swaggerSetup(app);
 
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

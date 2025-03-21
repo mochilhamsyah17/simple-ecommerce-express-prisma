@@ -35,7 +35,12 @@ export const createOrder = async (req, res) => {
         throw new Error(`Not enough stock for product ${product.productName}`);
 
       totalAmount += product.price * item.quantity;
-      return { productId: item.productId, quantity: item.quantity };
+      return {
+        productId: item.productId,
+        productName: product.productName,
+        price: product.price,
+        quantity: item.quantity,
+      };
     });
 
     // Buat order dengan relasi ke User
@@ -46,7 +51,11 @@ export const createOrder = async (req, res) => {
         totalAmount,
         OrderItems: { create: orderItems },
       },
-      include: { OrderItems: true },
+      include: {
+        OrderItems: {
+          include: { Product: true },
+        },
+      },
     });
 
     // Kurangi stok produk yang dipesan
@@ -90,7 +99,11 @@ export const getOrderByUser = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
       where: { userId },
-      include: { OrderItems: true },
+      include: {
+        OrderItems: {
+          include: { Product: true },
+        },
+      },
     });
     res.json(orders);
   } catch (error) {
