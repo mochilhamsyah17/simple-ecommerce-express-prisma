@@ -7,16 +7,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("user")
-  createdAt DateTime @default(now())
+model Order {
+  orderId     Int         @id @default(autoincrement())
+  userId      Int
+  orderDate   DateTime
+  totalAmount Int
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Order_userId_fkey")
+  orderItems  OrderItem[]
+  payments    Payment[]
 
-  products Product[]
-  orders   Order[]
+  @@index([userId], map: "Order_userId_fkey")
+}
+
+model OrderItem {
+  orderItemId Int     @id @default(autoincrement())
+  orderId     Int
+  productId   Int
+  quantity    Int
+  order       Order   @relation(fields: [orderId], references: [orderId], onDelete: Cascade, map: "OrderItem_orderId_fkey")
+  product     Product @relation(fields: [productId], references: [productId], onDelete: Cascade, map: "OrderItem_productId_fkey")
+
+  @@index([orderId], map: "OrderItem_orderId_fkey")
+  @@index([productId], map: "OrderItem_productId_fkey")
+}
+
+model Payment {
+  paymentId     Int      @id @default(autoincrement())
+  orderId       Int
+  paymentDate   DateTime
+  paymentStatus Boolean
+  order         Order    @relation(fields: [orderId], references: [orderId], onDelete: Cascade, map: "Payment_orderId_fkey")
+
+  @@index([orderId], map: "Payment_orderId_fkey")
 }
 
 model Product {
@@ -25,33 +47,17 @@ model Product {
   price         Int
   stockQuantity Int
   sellerId      Int
-  seller        User?       @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  OrderItems    OrderItem[]
+  orderItems    OrderItem[]
+  seller        User        @relation(fields: [sellerId], references: [id], onDelete: Cascade, map: "Product_sellerId_fkey")
 }
 
-model Order {
-  orderId     Int         @id @default(autoincrement())
-  userId      Int
-  orderDate   DateTime
-  totalAmount Int
-  User        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Payment     Payment[]
-  OrderItems  OrderItem[]
-}
-
-model Payment {
-  paymentId     Int      @id @default(autoincrement())
-  orderId       Int
-  paymentDate   DateTime
-  paymentStatus Boolean
-  order         Order    @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
-}
-
-model OrderItem {
-  orderItemId Int     @id @default(autoincrement())
-  orderId     Int
-  productId   Int
-  quantity    Int
-  Order       Order   @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
-  Product     Product @relation(fields: [productId], references: [productId], onDelete: Cascade)
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique(map: "User_email_key")
+  password  String
+  role      String    @default("user")
+  createdAt DateTime  @default(now())
+  orders    Order[]
+  products  Product[]
 }

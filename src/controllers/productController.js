@@ -1,3 +1,4 @@
+import { z } from "zod";
 import prisma from "../prisma/client.js";
 
 export const getProducts = async (req, res) => {
@@ -31,19 +32,25 @@ export const getProducts = async (req, res) => {
 
 export const postProduct = async (req, res) => {
   try {
+    const productSchema = z.object({
+      productName: z.string().min(3),
+      price: z.number().min(0),
+      stockQuantity: z.number().min(0),
+    });
+
     const sellerId = req.user.userId;
 
-    const { productName, price, stockQuantity } = req.body;
+    const data = productSchema.parse(req.body);
 
-    if (!productName || !price || !stockQuantity) {
+    if (!data.productName || !data.price || !data.stockQuantity) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const product = await prisma.product.create({
       data: {
-        productName,
-        price,
-        stockQuantity,
+        productName: data.productName,
+        price: data.price,
+        stockQuantity: data.stockQuantity,
         sellerId,
       },
     });

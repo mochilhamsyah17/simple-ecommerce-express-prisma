@@ -37,8 +37,6 @@ export const createOrder = async (req, res) => {
       totalAmount += product.price * item.quantity;
       return {
         productId: item.productId,
-        productName: product.productName,
-        price: product.price,
         quantity: item.quantity,
       };
     });
@@ -49,11 +47,11 @@ export const createOrder = async (req, res) => {
         userId,
         orderDate: new Date(),
         totalAmount,
-        OrderItems: { create: orderItems },
+        orderItems: { create: orderItems },
       },
       include: {
-        OrderItems: {
-          include: { Product: true },
+        orderItems: {
+          include: { product: true },
         },
       },
     });
@@ -79,7 +77,7 @@ export const createOrder = async (req, res) => {
 export const getOrder = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
-      include: { OrderItems: true },
+      include: { orderItems: true },
     });
     res.json(orders);
   } catch (error) {
@@ -100,7 +98,7 @@ export const getOrderByUser = async (req, res) => {
     const orders = await prisma.order.findMany({
       where: { userId },
       include: {
-        OrderItems: {
+        orderItems: {
           include: { Product: true },
         },
       },
