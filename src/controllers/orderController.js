@@ -99,8 +99,9 @@ export const getOrderByUser = async (req, res) => {
       where: { userId },
       include: {
         orderItems: {
-          include: { Product: true },
+          include: { product: true },
         },
+        payment: true,
       },
     });
     res.json(orders);
