@@ -1,6 +1,10 @@
 import express from "express";
 import { authenticate, authorize } from "../middlewares/authMiddleware.js";
-import { getProducts, postProduct } from "../controllers/productController.js";
+import {
+  getProducts,
+  postProduct,
+  updateProduct,
+} from "../controllers/productController.js";
 
 const router = express.Router();
 
@@ -94,5 +98,6 @@ const router = express.Router();
 
 router.get("/", getProducts);
 router.post("/post-products", authenticate, authorize("admin"), postProduct);
+router.put("/update", authenticate, authorize("admin"), updateProduct);
 
 export default router;

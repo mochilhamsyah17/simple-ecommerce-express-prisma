@@ -1,3 +1,4 @@
+import { z } from "zod";
 import prisma from "../prisma/client.js";
 
 export const createOrder = async (req, res) => {
@@ -104,7 +105,51 @@ export const getOrderByUser = async (req, res) => {
         payment: true,
       },
     });
-    res.json(orders);
+    res.json({
+      message: "Orders retrieved successfully",
+      orders,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+export const updateOrder = async (req, res) => {
+  try {
+    const validationSchema = z.object({
+      data: z.object({
+        status: z.string().min(5),
+      }),
+    });
+
+    const { orderId } = req.params;
+    if (!orderId) {
+      return res.status(400).json({ message: "Order ID is required" });
+    }
+
+    const parsedOrderId = parseInt(orderId, 10);
+    if (isNaN(parsedOrderId)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+
+    // Validasi data input menggunakan Zod
+    const parsedData = validationSchema.safeParse(req.body);
+    if (!parsedData.success) {
+      return res
+        .status(400)
+        .json({ message: "Invalid request data", error: parsedData.error });
+    }
+
+    const { data } = parsedData.data;
+
+    const updatedOrder = await prisma.order.update({
+      where: { orderId: parsedOrderId },
+      data,
+    });
+
+    res.json({ message: "Order updated successfully", order: updatedOrder });
   } catch (error) {
     return res
       .status(500)

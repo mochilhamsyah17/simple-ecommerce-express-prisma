@@ -3,6 +3,7 @@ import {
   createOrder,
   getOrder,
   getOrderByUser,
+  updateOrder,
 } from "../controllers/orderController.js";
 import { authenticate, authorize } from "../middlewares/authMiddleware.js";
 
@@ -123,5 +124,6 @@ const router = express.Router();
 router.post("/", authenticate, authorize("user"), createOrder);
 router.get("/", authenticate, authorize("admin"), getOrder);
 router.get("/my-orders", authenticate, authorize("user"), getOrderByUser);
+router.put("/update/:orderId", authenticate, authorize("admin"), updateOrder);
 
 export default router;
