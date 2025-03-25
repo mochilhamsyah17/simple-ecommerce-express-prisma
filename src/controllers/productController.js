@@ -108,7 +108,7 @@ export const postProduct = async (req, res) => {
         where: { productId: product.productId },
         include: {
           productCategories: {
-            include: { category: true }, // Menampilkan detail kategori
+            include: { category: true },
           },
         },
       });
@@ -224,6 +224,43 @@ export const updateProduct = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error in updateProduct",
+      error: error.message,
+    });
+  }
+};
+
+export const deleteMultipleProducts = async (req, res) => {
+  try {
+    const { productIds } = req.body;
+
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or empty productIds array" });
+    }
+
+    const parsedProductIds = productIds
+      .map((id) => parseInt(id, 10))
+      .filter((id) => !isNaN(id));
+
+    if (parsedProductIds.length === 0) {
+      return res.status(400).json({ message: "No valid product IDs provided" });
+    }
+
+    const deleteResult = await prisma.product.deleteMany({
+      where: { productId: { in: parsedProductIds } },
+    });
+
+    if (deleteResult.count === 0) {
+      return res.status(404).json({ message: "No matching products found" });
+    }
+
+    res.status(200).json({
+      message: `Successfully deleted ${deleteResult.count} products`,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error ketika menghapus produk",
       error: error.message,
     });
   }

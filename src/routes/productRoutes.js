@@ -1,6 +1,7 @@
 import express from "express";
 import { authenticate, authorize } from "../middlewares/authMiddleware.js";
 import {
+  deleteMultipleProducts,
   getProducts,
   postProduct,
   updateProduct,
@@ -99,5 +100,11 @@ const router = express.Router();
 router.get("/", getProducts);
 router.post("/post-products", authenticate, authorize("admin"), postProduct);
 router.put("/update", authenticate, authorize("admin"), updateProduct);
+router.delete(
+  "/delete",
+  authenticate,
+  authorize("admin"),
+  deleteMultipleProducts
+);
 
 export default router;
