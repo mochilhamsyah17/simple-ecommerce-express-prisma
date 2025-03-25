@@ -156,3 +156,53 @@ export const updateOrder = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
+export const cancelOrder = async (req, res) => {
+  const userId = req.user?.userId;
+  try {
+    const { orderId } = req.params;
+    if (!orderId) {
+      return res.status(400).json({ message: "Order ID is required" });
+    }
+
+    const parsedOrderId = parseInt(orderId, 10);
+    if (isNaN(parsedOrderId)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { orderId: parsedOrderId },
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.status !== "pending") {
+      return res
+        .status(400)
+        .json({ message: "Order tidak bisa dicancel karna sudah diproses" });
+    }
+
+    if (order.userId !== userId) {
+      return res
+        .status(400)
+        .json({ message: "Order tidak bisa dicancel karna bukan milik anda" });
+    }
+
+    const updatedOrder = await prisma.order.delete({
+      where: { orderId: parsedOrderId },
+      include: {
+        orderItems: {
+          include: { product: true },
+        },
+      },
+    });
+
+    res.json({ message: "Order cancelled successfully", order: updatedOrder });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+};

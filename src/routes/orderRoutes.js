@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  cancelOrder,
   createOrder,
   getOrder,
   getOrderByUser,
@@ -125,5 +126,6 @@ router.post("/", authenticate, authorize("user"), createOrder);
 router.get("/", authenticate, authorize("admin"), getOrder);
 router.get("/my-orders", authenticate, authorize("user"), getOrderByUser);
 router.put("/update/:orderId", authenticate, authorize("admin"), updateOrder);
+router.delete("/cancel/:orderId", authenticate, cancelOrder);
 
 export default router;
