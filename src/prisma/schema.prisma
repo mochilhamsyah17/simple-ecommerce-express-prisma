@@ -12,11 +12,19 @@ model Order {
   userId      Int
   orderDate   DateTime
   totalAmount Int
+  status      OrderStatus @default(pending)
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Order_userId_fkey")
   orderItems  OrderItem[]
   payment     Payment?
 
   @@index([userId], map: "Order_userId_fkey")
+}
+
+enum OrderStatus {
+  pending
+  diproses
+  dikirim
+  selesai
 }
 
 model OrderItem {
@@ -44,6 +52,7 @@ model Payment {
 model Product {
   productId         Int               @id @default(autoincrement())
   productName       String
+  imageUrl          String?
   price             Int
   stockQuantity     Int
   sellerId          Int
