@@ -1,6 +1,7 @@
 import express from "express";
 import { authenticate, authorize } from "../middlewares/authMiddleware.js";
 import {
+  changePassword,
   deleteUser,
   getMyInfo,
   getUsers,
@@ -131,6 +132,7 @@ const router = express.Router();
 router.get("/", authenticate, authorize("admin"), getUsers);
 router.get("/my-info", authenticate, getMyInfo);
 router.put("/update", authenticate, updateUser);
+router.put("/change-password", authenticate, changePassword);
 router.delete("/:id", authenticate, authorize("admin"), deleteUser);
 
 export default router;

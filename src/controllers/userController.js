@@ -1,5 +1,6 @@
 import { z } from "zod";
 import prisma from "../prisma/client.js";
+import { compare, hash } from "bcryptjs";
 
 const userSchema = z.object({
   name: z.string().min(3),
@@ -131,6 +132,64 @@ export const deleteUser = async (req, res) => {
 
     res.status(200).json({
       message: "User deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: User not found" });
+    }
+
+    const validationSchema = z.object({
+      oldPassword: z.string().min(6),
+      newPassword: z.string().min(6),
+    });
+
+    const parsedData = validationSchema.safeParse(req.body);
+    if (!parsedData.success) {
+      return res
+        .status(400)
+        .json({ message: "Invalid request data", error: parsedData.error });
+    }
+
+    const { oldPassword, newPassword } = parsedData.data;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        password: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid old password" });
+    }
+
+    const hashedPassword = await hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    res.status(200).json({
+      message: "Password changed successfully",
     });
   } catch (error) {
     return res.status(500).json({
