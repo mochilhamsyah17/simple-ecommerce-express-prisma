@@ -120,6 +120,67 @@ import { authenticate, authorize } from "../middlewares/authMiddleware.js";
  *       500:
  *         description: Internal Server Error
  * */
+/**
+ * @swagger
+ * /api/orders/update/{orderId}:
+ *   put:
+ *     summary: Update an order
+ *     description: Update the status of an order.
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: orderId
+ *         in: path
+ *         required: true
+ *         description: ID of the order to update
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Order'
+ *     responses:
+ *       200:
+ *         description: Order updated successfully
+ *       400:
+ *         description: Invalid request data
+ *       401:
+ *         description: Unauthorized (Token missing or invalid)
+ *       403:
+ *         description: Forbidden (User not authorized)
+ *       500:
+ *         description: Internal Server Error
+ * */
+/**
+ * @swagger
+ * /api/orders/cancel/{orderId}:
+ *   delete:
+ *     summary: Cancel an order
+ *     description: Cancel an order.
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: orderId
+ *         in: path
+ *         required: true
+ *         description: ID of the order to cancel
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Order canceled successfully
+ *       401:
+ *         description: Unauthorized (Token missing or invalid)
+ *       403:
+ *         description: Forbidden (User not authorized)
+ *       500:
+ *         description: Internal Server Error
+ * */
+
 const router = express.Router();
 
 router.post("/", authenticate, authorize("user"), createOrder);

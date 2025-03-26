@@ -97,6 +97,67 @@ const router = express.Router();
  *         description: Internal Server Error
  */
 
+/**
+ * @swagger
+ * /api/products/update:
+ *   put:
+ *     summary: Update a product
+ *     description: Update a product.
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       200:
+ *         description: Product updated successfully
+ *       400:
+ *         description: Invalid request data
+ *       401:
+ *         description: Unauthorized (Token missing or invalid)
+ *       403:
+ *         description: Forbidden (User not authorized)
+ *       500:
+ *         description: Internal Server Error
+ */
+
+/**
+ * @swagger
+ * /api/products/delete:
+ *   delete:
+ *     summary: Delete multiple products
+ *     description: Delete multiple products.
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Multiple products deleted successfully
+ *       400:
+ *         description: Invalid request data
+ *       401:
+ *         description: Unauthorized (Token missing or invalid)
+ *       403:
+ *         description: Forbidden (User not authorized)
+ *       500:
+ *         description: Internal Server Error
+ */
+
 router.get("/", getProducts);
 router.post("/post-products", authenticate, authorize("admin"), postProduct);
 router.put("/update", authenticate, authorize("admin"), updateProduct);
